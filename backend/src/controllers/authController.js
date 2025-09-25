@@ -2,6 +2,27 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const pool = require('../config/database');
 
+const queryWithRetry = async (query, params, maxRetries = 3) => {
+  let lastError;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const result = await pool.query(query, params);
+      return result;
+    } catch (error) {
+      lastError = error;
+      console.log(`Database attempt ${attempt} failed:`, error.code);
+      
+      if (error.code === 'ECONNRESET' && attempt < maxRetries) {
+        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+        continue;
+      }
+      break;
+    }
+  }
+  throw lastError;
+};
+
 const register = async (req, res) => {
   try {
     const { username, email, password, firstName, lastName, fullName } = req.body;
