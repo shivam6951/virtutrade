@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { Download, Calendar, TrendingUp, TrendingDown } from 'lucide-react';
 
@@ -10,7 +10,7 @@ const PortfolioGrowthChart = ({ portfolioData }) => {
   
   const { totalInvested = 0, currentValue = 0, totalGain = 0, gainPercentage = 0 } = portfolioData || {};
 
-  const timeRanges = [
+  const timeRanges = useMemo(() => [
     { key: '1D', label: '1D', days: 1 },
     { key: '1W', label: '1W', days: 7 },
     { key: '1M', label: '1M', days: 30 },
@@ -18,7 +18,7 @@ const PortfolioGrowthChart = ({ portfolioData }) => {
     { key: '6M', label: '6M', days: 180 },
     { key: '1Y', label: '1Y', days: 365 },
     { key: 'ALL', label: 'All Time', days: null }
-  ];
+  ], []);
 
   const generateChartData = useCallback(() => {
     const today = new Date();
