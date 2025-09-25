@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Filter, Download } from 'lucide-react';
 import api from '../utils/api';
 
@@ -10,9 +10,9 @@ const Transactions = () => {
 
   useEffect(() => {
     fetchTransactions();
-  }, []);
+  }, [fetchTransactions]);
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     try {
       const response = await api.getTransactions(token);
       const data = await response.json();
@@ -22,7 +22,7 @@ const Transactions = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   const filteredTransactions = transactions.filter(transaction => {
     if (filter !== 'ALL' && transaction.transaction_type !== filter) return false;

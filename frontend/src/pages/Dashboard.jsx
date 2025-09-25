@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { TrendingUp, TrendingDown, Wallet, PieChart } from 'lucide-react';
 import api from '../utils/api';
 import useAutoRefresh from '../hooks/useAutoRefresh';
@@ -9,7 +9,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem('token');
 
-  const fetchPortfolioData = async () => {
+  const fetchPortfolioData = useCallback(async () => {
     try {
       console.log('Fetching portfolio data...');
       const response = await api.getPortfolio(token);
@@ -30,11 +30,11 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     fetchPortfolioData();
-  }, []);
+  }, [fetchPortfolioData]);
 
   // Auto-refresh every 30 seconds
   useAutoRefresh(fetchPortfolioData, 30000);
