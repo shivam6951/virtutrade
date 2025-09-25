@@ -46,8 +46,25 @@ app.use('/api/market', marketRoutes);
 app.use('/api/user', userRoutes);
 
 // Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'VirtuTrade API is running' });
+app.get('/api/health', async (req, res) => {
+  try {
+    const pool = require('./config/database');
+    const result = await pool.query('SELECT NOW() as time');
+    res.json({ 
+      status: 'OK', 
+      message: 'VirtuTrade API is running',
+      database: 'Connected',
+      timestamp: result.rows[0].time
+    });
+  } catch (error) {
+    console.error('Health check database error:', error);
+    res.status(500).json({ 
+      status: 'ERROR', 
+      message: 'Database connection failed',
+      error: error.message,
+      code: error.code
+    });
+  }
 });
 
 // Error handling middleware
@@ -61,7 +78,20 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
+  
+  // Test database connection
+  try {
+    const pool = require('./config/database');
+    const result = await pool.query('SELECT NOW() as current_time, version() as pg_version');
+    console.log('✅ Database connected successfully!');
+    console.log('Current time:', result.rows[0].current_time);
+    console.log('PostgreSQL version:', result.rows[0].pg_version.split(' ')[0]);
+  } catch (error) {
+    console.error('❌ Database connection failed:', error.message);
+    console.error('Error code:', error.code);
+  }
+  
   startPriceScheduler();
 });

@@ -1,35 +1,44 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-const pool = new Pool({
+console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+
+// Railway-specific configuration
+const isProduction = process.env.NODE_ENV === 'production';
+
+const poolConfig = {
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? {
-    rejectUnauthorized: false,
-    require: true
-  } : false,
-  max: 5,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000,
-  acquireTimeoutMillis: 10000,
-  keepAlive: true,
-  keepAliveInitialDelayMillis: 5000
-});
+  ssl: isProduction ? { rejectUnauthorized: false } : false,
+  max: 3,
+  min: 0,
+  idleTimeoutMillis: 10000,
+  connectionTimeoutMillis: 5000,
+  acquireTimeoutMillis: 5000,
+  createTimeoutMillis: 5000,
+  destroyTimeoutMillis: 5000,
+  reapIntervalMillis: 1000,
+  createRetryIntervalMillis: 200
+};
+
+console.log('Pool config:', { ...poolConfig, connectionString: poolConfig.connectionString ? '[HIDDEN]' : 'MISSING' });
+
+const pool = new Pool(poolConfig);
 
 pool.on('error', (err) => {
-  console.error('Database pool error:', err);
+  console.error('Database pool error:', err.message, err.code);
 });
 
-pool.on('connect', () => {
-  console.log('Database connected successfully');
+pool.on('connect', (client) => {
+  console.log('New database connection established');
 });
 
-// Test connection on startup
-pool.query('SELECT NOW()')
-  .then(result => {
-    console.log('Database connection test successful:', result.rows[0]);
-  })
-  .catch(err => {
-    console.error('Database connection test failed:', err);
-  });
+pool.on('acquire', () => {
+  console.log('Connection acquired from pool');
+});
+
+pool.on('remove', () => {
+  console.log('Connection removed from pool');
+});
 
 module.exports = pool;
