@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import api from '../utils/api';
@@ -12,7 +12,7 @@ const Portfolio = () => {
   const [showSellModal, setShowSellModal] = useState(false);
   const token = localStorage.getItem('token');
 
-  const fetchPortfolioData = async () => {
+  const fetchPortfolioData = useCallback(async () => {
     try {
       const response = await api.getPortfolio(token);
       const data = await response.json();
@@ -22,11 +22,11 @@ const Portfolio = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     fetchPortfolioData();
-  }, []);
+  }, [fetchPortfolioData]);
 
   // Auto-refresh every 30 seconds
   useAutoRefresh(fetchPortfolioData, 30000);
@@ -41,7 +41,6 @@ const Portfolio = () => {
 
   const { 
     holdings = [], 
-    totalInvested = 0, 
     currentValue = 0, 
     totalGain = 0, 
     gainPercentage = 0 
