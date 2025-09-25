@@ -63,9 +63,9 @@ const login = async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    // Find user
+    // Find user with retry
     console.log('Querying database for user:', email);
-    const result = await pool.query(
+    const result = await queryWithRetry(
       'SELECT id, username, email, password_hash, balance, first_name, last_name, full_name FROM users WHERE email = $1',
       [email]
     );
