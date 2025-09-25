@@ -80,17 +80,37 @@ app.use('*', (req, res) => {
 
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
+  console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+  console.log('NODE_ENV:', process.env.NODE_ENV);
   
-  // Test database connection
-  try {
-    const pool = require('./config/database');
-    const result = await pool.query('SELECT NOW() as current_time, version() as pg_version');
-    console.log('✅ Database connected successfully!');
-    console.log('Current time:', result.rows[0].current_time);
-    console.log('PostgreSQL version:', result.rows[0].pg_version.split(' ')[0]);
-  } catch (error) {
-    console.error('❌ Database connection failed:', error.message);
-    console.error('Error code:', error.code);
+  // Comprehensive database connection test
+  const { Pool } = require('pg');
+  
+  const testConfigs = [
+    { name: 'Current config', ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false },
+    { name: 'No SSL', ssl: false },
+    { name: 'SSL required', ssl: { rejectUnauthorized: false, require: true } }
+  ];
+  
+  for (const config of testConfigs) {
+    console.log(`\n🔄 Testing: ${config.name}`);
+    const testPool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: config.ssl,
+      max: 1,
+      connectionTimeoutMillis: 5000
+    });
+    
+    try {
+      const result = await testPool.query('SELECT NOW() as time');
+      console.log('✅ SUCCESS! Database connected with:', config.name);
+      console.log('Time:', result.rows[0].time);
+      await testPool.end();
+      break;
+    } catch (error) {
+      console.log('❌ FAILED:', error.code, error.message);
+      await testPool.end();
+    }
   }
   
   startPriceScheduler();
