@@ -8,17 +8,11 @@ console.log('NODE_ENV:', process.env.NODE_ENV);
 const isProduction = process.env.NODE_ENV === 'production';
 
 const poolConfig = {
-  connectionString: process.env.DATABASE_URL,
+  connectionString: process.env.DATABASE_URL + (isProduction ? '?sslmode=require' : ''),
   ssl: isProduction ? { rejectUnauthorized: false } : false,
   max: 3,
-  min: 0,
   idleTimeoutMillis: 10000,
-  connectionTimeoutMillis: 5000,
-  acquireTimeoutMillis: 5000,
-  createTimeoutMillis: 5000,
-  destroyTimeoutMillis: 5000,
-  reapIntervalMillis: 1000,
-  createRetryIntervalMillis: 200
+  connectionTimeoutMillis: 5000
 };
 
 console.log('Pool config:', { ...poolConfig, connectionString: poolConfig.connectionString ? '[HIDDEN]' : 'MISSING' });

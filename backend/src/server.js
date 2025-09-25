@@ -67,6 +67,27 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
+// Database connectivity test
+app.get('/test-db', async (req, res) => {
+  try {
+    const pool = require('./config/database');
+    const result = await pool.query('SELECT NOW() as current_time, version() as pg_version');
+    res.json({
+      success: true,
+      message: 'Database connection successful',
+      data: result.rows[0]
+    });
+  } catch (error) {
+    console.error('DB test failed:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      code: error.code,
+      stack: error.stack
+    });
+  }
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
