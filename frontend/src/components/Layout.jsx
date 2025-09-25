@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -38,7 +38,7 @@ const Layout = ({ children, user, onLogout }) => {
   ];
 
   // Fetch updated user profile
-  const fetchUserProfile = async () => {
+  const fetchUserProfile = useCallback(async () => {
     try {
       const response = await api.getUserProfile(token);
       if (response.ok) {
@@ -49,12 +49,12 @@ const Layout = ({ children, user, onLogout }) => {
     } catch (error) {
       console.error('Error fetching user profile:', error);
     }
-  };
+  }, [token]);
 
   // Update user profile when component mounts
   React.useEffect(() => {
     fetchUserProfile();
-  }, []);
+  }, [fetchUserProfile]);
 
   // Close dropdown when clicking outside
   React.useEffect(() => {

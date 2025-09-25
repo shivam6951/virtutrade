@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, TrendingUp, TrendingDown } from 'lucide-react';
 import api from '../utils/api';
 
@@ -31,9 +31,9 @@ const SearchBar = ({ onBuyStock }) => {
       setResults([]);
       setShowResults(false);
     }
-  }, [query]);
+  }, [query, searchStocks]);
 
-  const searchStocks = async () => {
+  const searchStocks = useCallback(async () => {
     setLoading(true);
     try {
       const response = await api.searchStocks(token, query);
@@ -45,7 +45,7 @@ const SearchBar = ({ onBuyStock }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token, query]);
 
   const handleBuy = (stock) => {
     onBuyStock(stock);

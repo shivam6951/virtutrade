@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
+import React, { useState, useEffect, useCallback } from 'react';
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { Download, Calendar, TrendingUp, TrendingDown } from 'lucide-react';
 
 const PortfolioGrowthChart = ({ portfolioData }) => {
   const [timeRange, setTimeRange] = useState('1M');
   const [chartData, setChartData] = useState([]);
-  const [loading, setLoading] = useState(false);
+
   const [investmentStartDate] = useState(new Date('2024-09-24')); // Your first investment date
   
   const { totalInvested = 0, currentValue = 0, totalGain = 0, gainPercentage = 0 } = portfolioData || {};
@@ -22,9 +22,9 @@ const PortfolioGrowthChart = ({ portfolioData }) => {
 
   useEffect(() => {
     generateChartData();
-  }, [timeRange, portfolioData]);
+  }, [timeRange, portfolioData, generateChartData]);
 
-  const generateChartData = () => {
+  const generateChartData = useCallback(() => {
     const today = new Date();
     const daysSinceStart = Math.floor((today - investmentStartDate) / (1000 * 60 * 60 * 24));
     
@@ -75,7 +75,7 @@ const PortfolioGrowthChart = ({ portfolioData }) => {
     }
     
     setChartData(dataPoints);
-  };
+  }, [timeRange, totalInvested, currentValue, totalGain, investmentStartDate]);
 
   const isRangeAvailable = (range) => {
     const today = new Date();

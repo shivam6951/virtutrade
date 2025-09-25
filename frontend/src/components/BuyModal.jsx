@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { X } from 'lucide-react';
 import api from '../utils/api';
 
@@ -15,9 +15,9 @@ const BuyModal = ({ stock, onClose, onSuccess }) => {
   useEffect(() => {
     fetchStockPrice();
     setWalletBalance(user.balance || 0);
-  }, [stock.symbol]);
+  }, [fetchStockPrice, user.balance]);
 
-  const fetchStockPrice = async () => {
+  const fetchStockPrice = useCallback(async () => {
     setPriceLoading(true);
     setError('');
     
@@ -39,7 +39,7 @@ const BuyModal = ({ stock, onClose, onSuccess }) => {
       setPriceLoading(false);
       setLoading(false);
     }
-  };
+  }, [stock.symbol, token]);
 
   const totalAmount = Number(quantity || 0) * Number(pricePerShare || 0);
   const remainingBalance = Number(walletBalance || 0) - totalAmount;
