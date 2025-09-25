@@ -56,23 +56,32 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
+    console.log('Login attempt for:', req.body.email);
     const { email, password } = req.body;
 
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
     // Find user
+    console.log('Querying database for user:', email);
     const result = await pool.query(
       'SELECT id, username, email, password_hash, balance, first_name, last_name, full_name FROM users WHERE email = $1',
       [email]
     );
 
     if (result.rows.length === 0) {
+      console.log('User not found:', email);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     const user = result.rows[0];
+    console.log('User found:', user.email);
 
     // Check password
     const isValidPassword = await bcrypt.compare(password, user.password_hash);
     if (!isValidPassword) {
+      console.log('Invalid password for user:', email);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
@@ -83,6 +92,7 @@ const login = async (req, res) => {
       { expiresIn: '24h' }
     );
 
+    console.log('Login successful for:', email);
     res.json({
       message: 'Login successful',
       token,
@@ -97,8 +107,12 @@ const login = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Login error details:', {
+      message: error.message,
+      code: error.code,
+      stack: error.stack
+    });
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 };
 
