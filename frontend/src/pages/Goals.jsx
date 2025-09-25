@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Target, Calendar, TrendingUp, Calculator, PieChart, Trash2 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Plus, Target, Calendar, Calculator, Trash2 } from 'lucide-react';
 
 const Goals = () => {
   const [goals, setGoals] = useState([]);
@@ -15,9 +15,9 @@ const Goals = () => {
 
   useEffect(() => {
     fetchGoals();
-  }, []);
+  }, [fetchGoals]);
 
-  const fetchGoals = async () => {
+  const fetchGoals = useCallback(async () => {
     try {
       const response = await fetch('http://localhost:3002/api/goals', {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -29,7 +29,7 @@ const Goals = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   const addGoal = async () => {
     console.log('Adding goal:', newGoal);

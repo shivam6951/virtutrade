@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { X } from 'lucide-react';
 import api from '../utils/api';
 
@@ -15,9 +15,9 @@ const SellModal = ({ stock, holding, onClose, onSuccess }) => {
 
   useEffect(() => {
     fetchStockPrice();
-  }, [stock.symbol]);
+  }, [fetchStockPrice]);
 
-  const fetchStockPrice = async () => {
+  const fetchStockPrice = useCallback(async () => {
     setPriceLoading(true);
     setError('');
     
@@ -38,7 +38,7 @@ const SellModal = ({ stock, holding, onClose, onSuccess }) => {
     } finally {
       setPriceLoading(false);
     }
-  };
+  }, [stock.symbol, token]);
 
   const totalAmount = Number(quantity || 0) * Number(pricePerShare || 0);
   const totalCost = Number(quantity || 0) * Number(avgBuyPrice || 0);
