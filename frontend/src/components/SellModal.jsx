@@ -13,10 +13,6 @@ const SellModal = ({ stock, holding, onClose, onSuccess }) => {
   const maxQuantity = parseInt(holding?.quantity) || 0;
   const avgBuyPrice = parseFloat(holding?.avg_buy_price) || 0;
 
-  useEffect(() => {
-    fetchStockPrice();
-  }, [fetchStockPrice]);
-
   const fetchStockPrice = useCallback(async () => {
     setPriceLoading(true);
     setError('');
@@ -38,7 +34,11 @@ const SellModal = ({ stock, holding, onClose, onSuccess }) => {
     } finally {
       setPriceLoading(false);
     }
-  }, [stock.symbol, token]);
+  }, [stock.symbol, stock.currentPrice, token]);
+
+  useEffect(() => {
+    fetchStockPrice();
+  }, [fetchStockPrice]);
 
   const totalAmount = Number(quantity || 0) * Number(pricePerShare || 0);
   const totalCost = Number(quantity || 0) * Number(avgBuyPrice || 0);

@@ -13,10 +13,6 @@ const Goals = () => {
   });
   const token = localStorage.getItem('token');
 
-  useEffect(() => {
-    fetchGoals();
-  }, [fetchGoals]);
-
   const fetchGoals = useCallback(async () => {
     try {
       const response = await fetch('http://localhost:3002/api/goals', {
@@ -30,6 +26,10 @@ const Goals = () => {
       setLoading(false);
     }
   }, [token]);
+
+  useEffect(() => {
+    fetchGoals();
+  }, [fetchGoals]);
 
   const addGoal = async () => {
     console.log('Adding goal:', newGoal);

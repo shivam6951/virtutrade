@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Plus, TrendingUp, TrendingDown, Heart, Search, X } from 'lucide-react';
 import api from '../utils/api';
 import BuyModal from '../components/BuyModal';
@@ -11,14 +11,14 @@ const Watchlist = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
-  const [newStock, setNewStock] = useState({ symbol: '', name: '' });
+
   const [selectedStock, setSelectedStock] = useState(null);
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [showSellModal, setShowSellModal] = useState(false);
   const [userHoldings, setUserHoldings] = useState([]);
   const token = localStorage.getItem('token');
 
-  const fetchWatchlist = async () => {
+  const fetchWatchlist = useCallback(async () => {
     try {
       const response = await api.getWatchlist(token);
       const data = await response.json();
@@ -28,9 +28,9 @@ const Watchlist = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
-  const fetchUserHoldings = async () => {
+  const fetchUserHoldings = useCallback(async () => {
     try {
       const response = await api.getPortfolio(token);
       const data = await response.json();
@@ -38,12 +38,12 @@ const Watchlist = () => {
     } catch (error) {
       console.error('Error fetching holdings:', error);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     fetchWatchlist();
     fetchUserHoldings();
-  }, []);
+  }, [fetchWatchlist, fetchUserHoldings]);
 
   // Auto-refresh every 30 seconds
   useAutoRefresh(() => {

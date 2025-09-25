@@ -12,11 +12,6 @@ const BuyModal = ({ stock, onClose, onSuccess }) => {
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-  useEffect(() => {
-    fetchStockPrice();
-    setWalletBalance(user.balance || 0);
-  }, [fetchStockPrice, user.balance]);
-
   const fetchStockPrice = useCallback(async () => {
     setPriceLoading(true);
     setError('');
@@ -39,7 +34,12 @@ const BuyModal = ({ stock, onClose, onSuccess }) => {
       setPriceLoading(false);
       setLoading(false);
     }
-  }, [stock.symbol, token]);
+  }, [stock.symbol, stock.currentPrice, token]);
+
+  useEffect(() => {
+    fetchStockPrice();
+    setWalletBalance(user.balance || 0);
+  }, [fetchStockPrice, user.balance]);
 
   const totalAmount = Number(quantity || 0) * Number(pricePerShare || 0);
   const remainingBalance = Number(walletBalance || 0) - totalAmount;

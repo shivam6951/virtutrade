@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { TrendingUp, TrendingDown, Heart, Share, Info } from 'lucide-react';
+import { TrendingUp, TrendingDown, Heart, Share } from 'lucide-react';
 import { mockStockData } from '../utils/mockData';
 
 const StockDetails = () => {

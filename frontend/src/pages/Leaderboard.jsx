@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Trophy, Medal, Award, TrendingUp } from 'lucide-react';
 import api from '../utils/api';
 
@@ -8,11 +8,7 @@ const Leaderboard = () => {
   const token = localStorage.getItem('token');
   const currentUser = JSON.parse(localStorage.getItem('user'));
 
-  useEffect(() => {
-    fetchLeaderboard();
-  }, []);
-
-  const fetchLeaderboard = async () => {
+  const fetchLeaderboard = useCallback(async () => {
     try {
       const response = await api.getLeaderboard(token);
       const data = await response.json();
@@ -23,7 +19,11 @@ const Leaderboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    fetchLeaderboard();
+  }, [fetchLeaderboard]);
 
   const getBadgeIcon = (badge) => {
     switch (badge) {

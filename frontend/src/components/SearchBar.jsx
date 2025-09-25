@@ -21,18 +21,6 @@ const SearchBar = ({ onBuyStock }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    if (query.length > 1) {
-      const timeoutId = setTimeout(() => {
-        searchStocks();
-      }, 300);
-      return () => clearTimeout(timeoutId);
-    } else {
-      setResults([]);
-      setShowResults(false);
-    }
-  }, [query, searchStocks]);
-
   const searchStocks = useCallback(async () => {
     setLoading(true);
     try {
@@ -46,6 +34,18 @@ const SearchBar = ({ onBuyStock }) => {
       setLoading(false);
     }
   }, [token, query]);
+
+  useEffect(() => {
+    if (query.length > 1) {
+      const timeoutId = setTimeout(() => {
+        searchStocks();
+      }, 300);
+      return () => clearTimeout(timeoutId);
+    } else {
+      setResults([]);
+      setShowResults(false);
+    }
+  }, [query, searchStocks]);
 
   const handleBuy = (stock) => {
     onBuyStock(stock);

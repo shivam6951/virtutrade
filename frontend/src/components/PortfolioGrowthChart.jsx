@@ -20,10 +20,6 @@ const PortfolioGrowthChart = ({ portfolioData }) => {
     { key: 'ALL', label: 'All Time', days: null }
   ];
 
-  useEffect(() => {
-    generateChartData();
-  }, [timeRange, portfolioData, generateChartData]);
-
   const generateChartData = useCallback(() => {
     const today = new Date();
     const daysSinceStart = Math.floor((today - investmentStartDate) / (1000 * 60 * 60 * 24));
@@ -75,7 +71,11 @@ const PortfolioGrowthChart = ({ portfolioData }) => {
     }
     
     setChartData(dataPoints);
-  }, [timeRange, totalInvested, currentValue, totalGain, investmentStartDate]);
+  }, [timeRange, totalInvested, currentValue, totalGain, investmentStartDate, timeRanges]);
+
+  useEffect(() => {
+    generateChartData();
+  }, [generateChartData]);
 
   const isRangeAvailable = (range) => {
     const today = new Date();

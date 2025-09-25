@@ -8,10 +8,6 @@ const Transactions = () => {
   const [filter, setFilter] = useState('ALL');
   const token = localStorage.getItem('token');
 
-  useEffect(() => {
-    fetchTransactions();
-  }, [fetchTransactions]);
-
   const fetchTransactions = useCallback(async () => {
     try {
       const response = await api.getTransactions(token);
@@ -23,6 +19,10 @@ const Transactions = () => {
       setLoading(false);
     }
   }, [token]);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [fetchTransactions]);
 
   const filteredTransactions = transactions.filter(transaction => {
     if (filter !== 'ALL' && transaction.transaction_type !== filter) return false;
