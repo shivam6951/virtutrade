@@ -20,8 +20,7 @@ const PORT = process.env.PORT || 5000;
 const corsOptions = {
   origin: [
     'http://localhost:3000',
-    'https://whimsical-speculoos-dcb78b.netlify.app',
-    'https://virtutrade.vercel.app'
+    'https://whimsical-speculoos-dcb78b.netlify.app'
   ],
   credentials: true
 };
