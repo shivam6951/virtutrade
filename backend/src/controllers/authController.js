@@ -67,9 +67,10 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
+  const { email, password } = req.body;
+  
   try {
-    console.log('Login attempt for:', req.body.email);
-    const { email, password } = req.body;
+    console.log('Login attempt for:', email);
 
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
